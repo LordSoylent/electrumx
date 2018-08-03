@@ -758,7 +758,7 @@ class Namecoin(AuxPowMixin, Coin):
         'elec.luggs.co s446',
     ]
 
-
+    
 class NamecoinTestnet(Namecoin):
     NAME = "Namecoin"
     SHORTNAME = "XNM"
@@ -769,6 +769,36 @@ class NamecoinTestnet(Namecoin):
     GENESIS_HASH = ('00000007199508e34a9ff81e6ec0c477'
                     'a4cccff2a4767a8eee39c11db367b008')
 
+# Source: syscoin.org
+class Syscoin(AuxPowMixin, Coin):
+    NAME = "Syscoin"
+    SHORTNAME = "SYS"
+    NET = "mainnet"
+    XPUB_VERBYTES = bytes.fromhex("0488b21e")
+    XPRV_VERBYTES = bytes.fromhex("0488ade4")
+    P2PKH_VERBYTE = bytes.fromhex("63")
+    P2SH_VERBYTES = [bytes.fromhex("05")]
+    WIF_BYTE = bytes.fromhex("80")
+    GENESIS_HASH = ('000006e5c08d6d2414435b2942102667'
+                    '53b05a75f90e926dd5e6082306812622')
+    RPC_PORT = 8369
+    TX_COUNT = 1000
+    TX_COUNT_HEIGHT = 135000
+    TX_PER_BLOCK = 10
+	REORG_LIMIT = 2000
+
+class SyscoinTestnet(Syscoincoin):
+    NAME = "Syscoin"
+    SHORTNAME = "TSYS"
+    NET = "testnet"
+
+    XPUB_VERBYTES = bytes.fromhex("043587cf")
+    XPRV_VERBYTES = bytes.fromhex("04358394")
+    P2PKH_VERBYTE = bytes.fromhex("41")
+    P2SH_VERBYTES = [bytes.fromhex("c4")]
+    WIF_BYTE = bytes.fromhex("ef")
+    GENESIS_HASH = ('00000478aace753a4709f7503b5b5834'
+                    '56a5a8635e989d7f899eb000bbea9fd4')
 
 class Dogecoin(AuxPowMixin, Coin):
     NAME = "Dogecoin"
