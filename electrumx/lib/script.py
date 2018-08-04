@@ -183,7 +183,7 @@ class Script(object):
         n = 1
         lengthScript = len(script)
         if len(script) > 1:
-		   if script[0] == 82:
+            if script[0] == 82:
                if script[1] >= 82 or script[1] <= 91:
                    n += 1
                    while n < lengthScript:
