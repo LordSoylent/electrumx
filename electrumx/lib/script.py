@@ -194,7 +194,7 @@ class Script(object):
                        if op > OpCodes.OP_PUSHDATA4:
                            break;
                        n += 1
-        if found == False
+        if found == False:
             n = 0
         else
             while n < lengthScript:
