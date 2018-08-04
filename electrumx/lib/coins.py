@@ -799,6 +799,7 @@ class SyscoinTestnet(Syscoin):
     WIF_BYTE = bytes.fromhex("ef")
     GENESIS_HASH = ('00000478aace753a4709f7503b5b5834'
                     '56a5a8635e989d7f899eb000bbea9fd4')
+    RPC_PORT = 18369
 
 class Dogecoin(AuxPowMixin, Coin):
     NAME = "Dogecoin"
