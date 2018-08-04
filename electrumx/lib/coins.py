@@ -785,7 +785,7 @@ class Syscoin(AuxPowMixin, Coin):
     TX_COUNT = 1000
     TX_COUNT_HEIGHT = 135000
     TX_PER_BLOCK = 10
-	REORG_LIMIT = 2000
+    REORG_LIMIT = 2000
 
 class SyscoinTestnet(Syscoincoin):
     NAME = "Syscoin"
