@@ -24,7 +24,6 @@ from electrumx.lib.merkle import Merkle, MerkleCache
 from electrumx.lib.util import chunks, formatted_time, class_logger
 import electrumx.server.db
 
-SYSCOIN_TX_VERSION = 0x7400
 class Prefetcher(object):
     '''Prefetches blocks (in the forward direction only).'''
 
@@ -507,8 +506,6 @@ class BlockProcessor(electrumx.server.db.DB):
         append_hashXs = hashXs_by_tx.append
 
         for tx, tx_hash in txs:
-            if tx.version == SYSCOIN_TX_VERSION:
-               continue;
             hashXs = []
             append_hashX = hashXs.append
             tx_numb = s_pack('<I', tx_num)
