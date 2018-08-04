@@ -196,7 +196,7 @@ class Script(object):
                        n += 1
         if found == False:
             n = 0
-        else
+        else:
             while n < lengthScript:
                 op = script[n]
                 if op != OP_DROP and op != OP_2DROP:
