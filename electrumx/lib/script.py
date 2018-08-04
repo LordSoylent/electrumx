@@ -200,7 +200,7 @@ class Script(object):
             while n < lengthScript:
                 op = script[n]
                 if op != OP_DROP and op != OP_2DROP:
-		           break;
+                    break;
                 n += 1
         # The unpacks or script[n] below throw on truncated scripts
         try:
