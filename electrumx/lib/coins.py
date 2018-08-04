@@ -787,7 +787,7 @@ class Syscoin(AuxPowMixin, Coin):
     TX_PER_BLOCK = 10
     REORG_LIMIT = 2000
 
-class SyscoinTestnet(Syscoincoin):
+class SyscoinTestnet(Syscoin):
     NAME = "Syscoin"
     SHORTNAME = "TSYS"
     NET = "testnet"
