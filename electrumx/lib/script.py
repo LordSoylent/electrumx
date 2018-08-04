@@ -180,11 +180,32 @@ class Script(object):
     @classmethod
     def get_ops(cls, script):
         ops = []
-
+        n = 1
+        lengthScript = len(script)
+        if len(script) > 1:
+		   if script[0] == 82:
+               if script[1] >= 82 or script[1] <= 91:
+                   n += 1
+                   while n < lengthScript:
+                       op = script[n]
+                       if op == OpCodes.OP_DROP or op == OpCodes.OP_2DROP:
+                           found = True
+                           break;
+                       if op > OpCodes.OP_PUSHDATA4:
+                           break;
+                       n += 1
+        if found == False
+            n = 0
+        else
+            while n < lengthScript:
+                op = script[n]
+                if op != OP_DROP and op != OP_2DROP:
+		           break;
+                n += 1
         # The unpacks or script[n] below throw on truncated scripts
         try:
             n = 0
-            while n < len(script):
+            while n < lengthScript:
                 op = script[n]
                 n += 1
 
@@ -201,7 +222,7 @@ class Script(object):
                     else:
                         dlen, = struct.unpack('<I', script[n: n + 4])
                         n += 4
-                    if n + dlen > len(script):
+                    if n + dlen > lengthScript:
                         raise IndexError
                     op = (op, script[n:n + dlen])
                     n += dlen
