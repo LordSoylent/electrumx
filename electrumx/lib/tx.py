@@ -305,7 +305,7 @@ class DeserializerSyscoin(DeserializerAuxPow):
         self.cursor = end = cursor + n
         assert self.binary_length >= end
         nBytes = self.binary[cursor:end]
-		if read_output == False:
+        if read_output == False:
 		   self.binaryReadForHash += nBytes
         return nBytes
 
