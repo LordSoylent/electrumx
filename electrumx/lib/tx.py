@@ -27,6 +27,7 @@
 
 '''Transaction-related classes and functions.'''
 
+
 from collections import namedtuple
 from struct import pack
 
@@ -286,83 +287,6 @@ class DeserializerSyscoin(DeserializerAuxPow):
     # have a version of 0x7400
     SYSCOIN_TX_VERSION = 0x7400
 
-    def __init__(self, binary, start=0):
-        assert isinstance(binary, bytes)
-        self.binaryReadForHash = b""
-        self.binary = binary
-        self.binary_length = len(binary)
-        self.cursor = start
-
-    def _read_byte(self):
-        cursor = self.cursor
-        self.cursor += 1
-        byte = self.binary[cursor]
-        self.binaryReadForHash += byte
-        return byte
-
-    def _read_nbytes(self, n,read_output=False):
-        cursor = self.cursor
-        self.cursor = end = cursor + n
-        assert self.binary_length >= end
-        nBytes = self.binary[cursor:end]
-        if read_output == False:
-            self.binaryReadForHash += nBytes
-        return nBytes
-
-    def _read_varbytes(self,read_output=False):
-        return self._read_nbytes(self._read_varint(),read_output)
-
-    def _read_varint(self,get_hash=False):
-        n = self.binary[self.cursor]
-        self.cursor += 1
-        if n < 253:
-            self.binaryReadForHash += pack(">B", n)
-            return n
-        if n == 253:
-            return self._read_le_uint16()
-        if n == 254:
-            return self._read_le_uint32()
-        return self._read_le_uint32()
-
-    def _read_le_int32(self):
-        result, = unpack_int32_from(self.binary, self.cursor)
-        self.binaryReadForHash += pack(">i", result)
-        self.cursor += 4
-        return result
-
-    def _read_le_int64(self):
-        result, = unpack_int64_from(self.binary, self.cursor)
-        self.binaryReadForHash += pack(">q", result)
-        self.cursor += 8
-        return result
-
-    def _read_le_uint16(self):
-        result, = unpack_uint16_from(self.binary, self.cursor)
-        self.binaryReadForHash += pack(">H", result)
-        self.cursor += 2
-        return result
-
-    def _read_le_uint32(self):
-        result, = unpack_uint32_from(self.binary, self.cursor)
-        self.binaryReadForHash += pack(">I", result)
-        self.cursor += 4
-        return result
-
-    def _read_le_uint64(self):
-        result, = unpack_uint64_from(self.binary, self.cursor)
-        self.binaryReadForHash += pack(">Q", result)
-        self.cursor += 8
-        return result
-
-    def read_tx_and_hash(self):
-        '''Return a (deserialized TX, tx_hash) pair.
-
-        The hash needs to be reversed for human display; for efficiency
-        we process it in the natural serialized order.
-        '''
-        self.binaryReadForHash = b""
-        return self.read_tx(get_hash=True), self.TX_HASH_FN(self.binaryReadForHash)
-
     def read_tx(self,get_hash=False):
         '''Return a deserialized transaction.'''
         version = self._read_le_int32()
@@ -378,12 +302,14 @@ class DeserializerSyscoin(DeserializerAuxPow):
         return [read_output(get_hash,tx_version) for i in range(self._read_varint())]
 
     def _read_output(self,get_hash,tx_version):
-        value =  self._read_le_int64()
-        scriptPubKey = self._read_varbytes(read_output=True)
+	    value =  self._read_le_int64()
+        scriptPubKey = self._read_varbytes()
         if (tx_version == self.SYSCOIN_TX_VERSION and
                 scriptPubKey[0] == OpCodes.OP_RETURN and get_hash == True):
-            scriptPubKey[:1]
-        self.binaryReadForHash += scriptPubKey
+				scriptLength = len(scriptPubKey)
+                del self.binary[self.cursor-scriptLength+1,self.cursor+scriptLength]
+                self.binary_length -= scriptLength-1
+                self.cursor -= scriptLength-1
         return TxOutput(
             value,  # value
             scriptPubKey,  # pk_script
