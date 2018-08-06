@@ -306,7 +306,7 @@ class DeserializerSyscoin(DeserializerAuxPow):
         assert self.binary_length >= end
         nBytes = self.binary[cursor:end]
         if read_output == False:
-		   self.binaryReadForHash += nBytes
+            self.binaryReadForHash += nBytes
         return nBytes
 
     def _read_varbytes(self,read_output=False):
