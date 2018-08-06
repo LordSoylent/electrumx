@@ -312,7 +312,7 @@ class DeserializerSyscoin(DeserializerAuxPow):
     def _read_varint(self):
         n = self.binary[self.cursor]
         self.cursor += 1
-        self.binaryReadForHash += n;
+        self.binaryReadForHash +=  pack(">b", n);
         if n < 253:
             return n
         if n == 253:
