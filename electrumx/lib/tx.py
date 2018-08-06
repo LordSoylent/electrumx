@@ -306,7 +306,7 @@ class DeserializerSyscoin(DeserializerAuxPow):
         scriptPubKey = self._read_varbytes()
         if (tx_version == self.SYSCOIN_TX_VERSION and
                 scriptPubKey[0] == OpCodes.OP_RETURN and get_hash == True):
-				scriptLength = len(scriptPubKey)
+                scriptLength = len(scriptPubKey)
                 del self.binary[self.cursor-scriptLength+1,self.cursor+scriptLength]
                 self.binary_length -= scriptLength-1
                 self.cursor -= scriptLength-1
