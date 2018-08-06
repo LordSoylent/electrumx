@@ -311,7 +311,7 @@ class DeserializerSyscoin(DeserializerAuxPow):
         return [read_output(get_hash,tx_version) for i in range(self._read_varint())]
 
     def _read_output(self,get_hash,tx_version):
-	    value =  self._read_le_int64()
+        value =  self._read_le_int64()
         scriptPubKey = self._read_varbytes()
         if (tx_version == self.SYSCOIN_TX_VERSION and
                 scriptPubKey[0] == OpCodes.OP_RETURN and get_hash == True):
