@@ -300,16 +300,19 @@ class DeserializerSyscoin(DeserializerAuxPow):
         self.binaryReadForHash += byte
         return byte
 
-    def _read_nbytes(self, n):
+    def _read_nbytes(self, n,read_output=False):
         cursor = self.cursor
         self.cursor = end = cursor + n
         assert self.binary_length >= end
-        return self.binary[cursor:end]
+        nBytes = self.binary[cursor:end]
+		if read_output == False:
+		   self.binaryReadForHash += nBytes
+        return nBytes
 
-    def _read_varbytes(self):
-        return self._read_nbytes(self._read_varint())
+    def _read_varbytes(self,read_output=False):
+        return self._read_nbytes(self._read_varint(),read_output)
 
-    def _read_varint(self):
+    def _read_varint(self,get_hash=False):
         n = self.binary[self.cursor]
         self.cursor += 1
         if n < 253:
@@ -376,7 +379,7 @@ class DeserializerSyscoin(DeserializerAuxPow):
 
     def _read_output(self,get_hash,tx_version):
         value =  self._read_le_int64()
-        scriptPubKey = self._read_varbytes()
+        scriptPubKey = self._read_varbytes(read_output=True)
         if (tx_version == self.SYSCOIN_TX_VERSION and
                 scriptPubKey[0] == OpCodes.OP_RETURN and get_hash == True):
             scriptPubKey[:1]
