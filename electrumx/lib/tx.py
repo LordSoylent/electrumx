@@ -294,8 +294,7 @@ class DeserializerSyscoin(DeserializerAuxPow):
         '''
         start = self.cursor
         tx = self.read_tx(get_hash=True)
-        txbinary = pack('>B', tx)
-        hash = self.TX_HASH_FN(txbinary)
+        hash = self.TX_HASH_FN(tx)
         return tx, hash
 
     def read_tx(self,get_hash=False):
