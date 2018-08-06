@@ -313,7 +313,7 @@ class DeserializerSyscoin(DeserializerAuxPow):
         n = self.binary[self.cursor]
         self.cursor += 1
         if n < 253:
-            self.binaryReadForHash += self.binary[self.cursor-1];
+            self.binaryReadForHash += pack(">B", n)
             return n
         if n == 253:
             return self._read_le_uint16()
