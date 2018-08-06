@@ -27,7 +27,6 @@
 
 '''Transaction-related classes and functions.'''
 
-
 from collections import namedtuple
 from struct import pack
 
@@ -295,7 +294,7 @@ class DeserializerSyscoin(DeserializerAuxPow):
         '''
         start = self.cursor
         tx = self.read_tx(get_hash=True)
-        txbinary = struct.pack('>B', tx)
+        txbinary = pack('>B', tx)
         hash = self.TX_HASH_FN(txbinary)
         return tx, hash
 
