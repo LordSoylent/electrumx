@@ -286,16 +286,72 @@ class DeserializerSyscoin(DeserializerAuxPow):
     # have a version of 0x7400
     SYSCOIN_TX_VERSION = 0x7400
 
+    def _read_byte(self):
+        cursor = self.cursor
+        self.cursor += 1
+        byte = self.binary[cursor]
+        self.binaryReadForHash += byte
+        return byte
+
+    def _read_nbytes(self, n):
+        cursor = self.cursor
+        self.cursor = end = cursor + n
+        assert self.binary_length >= end
+        return self.binary[cursor:end]
+
+    def _read_varbytes(self):
+        return self._read_nbytes(self._read_varint())
+
+    def _read_varint(self):
+        n = self.binary[self.cursor]
+        self.cursor += 1
+        self.binaryReadForHash += n;
+        if n < 253:
+            return n
+        if n == 253:
+            return self._read_le_uint16()
+        if n == 254:
+            return self._read_le_uint32()
+        return self._read_le_uint32()
+
+    def _read_le_int32(self):
+        result, = unpack_int32_from(self.binary, self.cursor)
+        self.binaryReadForHash += result
+        self.cursor += 4
+        return result
+
+    def _read_le_int64(self):
+        result, = unpack_int64_from(self.binary, self.cursor)
+        self.binaryReadForHash += result
+        self.cursor += 8
+        return result
+
+    def _read_le_uint16(self):
+        result, = unpack_uint16_from(self.binary, self.cursor)
+        self.binaryReadForHash += result
+        self.cursor += 2
+        return result
+
+    def _read_le_uint32(self):
+        result, = unpack_uint32_from(self.binary, self.cursor)
+        self.binaryReadForHash += result
+        self.cursor += 4
+        return result
+
+    def _read_le_uint64(self):
+        result, = unpack_uint64_from(self.binary, self.cursor)
+        self.binaryReadForHash += result
+        self.cursor += 8
+        return result
+
     def read_tx_and_hash(self):
         '''Return a (deserialized TX, tx_hash) pair.
 
         The hash needs to be reversed for human display; for efficiency
         we process it in the natural serialized order.
         '''
-        start = self.cursor
-        tx = self.read_tx(get_hash=True)
-        hash = self.TX_HASH_FN(tx)
-        return tx, hash
+        self.binaryReadForHash = []
+        return self.read_tx(get_hash=True), self.TX_HASH_FN(self.binaryReadForHash)
 
     def read_tx(self,get_hash=False):
         '''Return a deserialized transaction.'''
@@ -317,7 +373,7 @@ class DeserializerSyscoin(DeserializerAuxPow):
         if (tx_version == self.SYSCOIN_TX_VERSION and
                 scriptPubKey[0] == OpCodes.OP_RETURN and get_hash == True):
             scriptPubKey[:1]
-
+        self.binaryReadForHash += scriptPubKey
         return TxOutput(
             value,  # value
             scriptPubKey,  # pk_script
