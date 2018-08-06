@@ -294,7 +294,10 @@ class DeserializerSyscoin(DeserializerAuxPow):
         we process it in the natural serialized order.
         '''
         start = self.cursor
-        return self.read_tx(get_hash=True), self.TX_HASH_FN(self.binary[start:self.cursor])
+        tx = self.read_tx(get_hash=True)
+        txbinary = struct.pack('>B', tx)
+        hash = self.TX_HASH_FN(txbinary)
+        return tx, hash
 
     def read_tx(self,get_hash=False):
         '''Return a deserialized transaction.'''
@@ -312,11 +315,10 @@ class DeserializerSyscoin(DeserializerAuxPow):
 
     def _read_output(self,get_hash,tx_version):
         value =  self._read_le_int64()
-		cursorBeforeScript = self.cursor
         scriptPubKey = self._read_varbytes()
         if (tx_version == self.SYSCOIN_TX_VERSION and
                 scriptPubKey[0] == OpCodes.OP_RETURN and get_hash == True):
-            self.binary = self.binary[:cursorBeforeScript+1] + self.binary[self.cursor:]
+            scriptPubKey[:1]
 
         return TxOutput(
             value,  # value
