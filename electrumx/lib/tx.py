@@ -316,7 +316,7 @@ class DeserializerSyscoin(DeserializerAuxPow):
         if (tx_version == self.SYSCOIN_TX_VERSION and
                 scriptPubKey[0] == OpCodes.OP_RETURN and get_hash == True):
                 scriptLength = len(scriptPubKey)
-                self.binary = self.binary[:self.cursor-scriptLength+1] + self.binary[:self.cursor+1]
+                self.binary = self.binary[:self.cursor-scriptLength+1] + self.binary[self.cursor+1:]
                 self.binary_length -= scriptLength-1
                 self.cursor -= scriptLength-1
         return TxOutput(
