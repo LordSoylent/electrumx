@@ -316,7 +316,7 @@ class DeserializerSyscoin(DeserializerAuxPow):
         scriptPubKey = self._read_varbytes()
         if (tx_version == self.SYSCOIN_TX_VERSION and
                 scriptPubKey[0] == OpCodes.OP_RETURN and get_hash == True):
-            del self.binary[cursorBeforeScript+1:self.cursor]
+            self.binary = self.binary[:cursorBeforeScript+1] + self.binary[self.cursor:]
 
         return TxOutput(
             value,  # value
