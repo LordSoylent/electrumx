@@ -287,21 +287,6 @@ class DeserializerSyscoin(DeserializerAuxPow):
     # have a version of 0x7400
     SYSCOIN_TX_VERSION = 0x7400
 
-    def __init__(self, binary, start=0):
-        assert isinstance(binary, bytes)
-        self.binary = bytearray(binary)
-        self.binary_length = len(binary)
-        self.cursor = start
-
-    def read_tx_and_hash(self):
-        '''Return a (deserialized TX, tx_hash) pair.
-
-        The hash needs to be reversed for human display; for efficiency
-        we process it in the natural serialized order.
-        '''
-        start = self.cursor
-        return self.read_tx(get_hash=True), self.TX_HASH_FN(self.binary[start:self.cursor])
-
     def read_tx(self,get_hash=False):
         '''Return a deserialized transaction.'''
         version = self._read_le_int32()
@@ -322,7 +307,7 @@ class DeserializerSyscoin(DeserializerAuxPow):
         if (tx_version == self.SYSCOIN_TX_VERSION and
                 scriptPubKey[0] == OpCodes.OP_RETURN and get_hash == True):
                 scriptLength = len(scriptPubKey)
-                del self.binary[self.cursor-scriptLength+1,self.cursor+1]
+                self.binary = self.binary[:self.cursor-scriptLength+1] + self.binary[:self.cursor+1]
                 self.binary_length -= scriptLength-1
                 self.cursor -= scriptLength-1
         return TxOutput(
