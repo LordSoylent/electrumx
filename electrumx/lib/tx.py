@@ -286,6 +286,13 @@ class DeserializerSyscoin(DeserializerAuxPow):
     # have a version of 0x7400
     SYSCOIN_TX_VERSION = 0x7400
 
+    def __init__(self, binary, start=0):
+        assert isinstance(binary, bytes)
+        self.binaryReadForHash = []
+        self.binary = binary
+        self.binary_length = len(binary)
+        self.cursor = start
+
     def _read_byte(self):
         cursor = self.cursor
         self.cursor += 1
