@@ -323,31 +323,31 @@ class DeserializerSyscoin(DeserializerAuxPow):
 
     def _read_le_int32(self):
         result, = unpack_int32_from(self.binary, self.cursor)
-        self.binaryReadForHash += struct.pack(">i", result)
+        self.binaryReadForHash += pack(">i", result)
         self.cursor += 4
         return result
 
     def _read_le_int64(self):
         result, = unpack_int64_from(self.binary, self.cursor)
-        self.binaryReadForHash += struct.pack(">q", result)
+        self.binaryReadForHash += pack(">q", result)
         self.cursor += 8
         return result
 
     def _read_le_uint16(self):
         result, = unpack_uint16_from(self.binary, self.cursor)
-        self.binaryReadForHash += struct.pack(">H", result)
+        self.binaryReadForHash += pack(">H", result)
         self.cursor += 2
         return result
 
     def _read_le_uint32(self):
         result, = unpack_uint32_from(self.binary, self.cursor)
-        self.binaryReadForHash += struct.pack(">I", result)
+        self.binaryReadForHash += pack(">I", result)
         self.cursor += 4
         return result
 
     def _read_le_uint64(self):
         result, = unpack_uint64_from(self.binary, self.cursor)
-        self.binaryReadForHash += struct.pack(">Q", result)
+        self.binaryReadForHash += pack(">Q", result)
         self.cursor += 8
         return result
 
