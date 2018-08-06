@@ -287,6 +287,15 @@ class DeserializerSyscoin(DeserializerAuxPow):
     # have a version of 0x7400
     SYSCOIN_TX_VERSION = 0x7400
 
+    def read_tx_and_hash(self):
+        '''Return a (deserialized TX, tx_hash) pair.
+
+        The hash needs to be reversed for human display; for efficiency
+        we process it in the natural serialized order.
+        '''
+        start = self.cursor
+        return self.read_tx(get_hash=True), self.TX_HASH_FN(self.binary[start:self.cursor])
+
     def read_tx(self,get_hash=False):
         '''Return a deserialized transaction.'''
         version = self._read_le_int32()
