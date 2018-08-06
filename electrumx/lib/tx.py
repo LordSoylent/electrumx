@@ -288,7 +288,7 @@ class DeserializerSyscoin(DeserializerAuxPow):
 
     def __init__(self, binary, start=0):
         assert isinstance(binary, bytes)
-        self.binaryReadForHash = []
+        self.binaryReadForHash = b""
         self.binary = binary
         self.binary_length = len(binary)
         self.cursor = start
@@ -357,7 +357,7 @@ class DeserializerSyscoin(DeserializerAuxPow):
         The hash needs to be reversed for human display; for efficiency
         we process it in the natural serialized order.
         '''
-        self.binaryReadForHash = []
+        self.binaryReadForHash = b""
         return self.read_tx(get_hash=True), self.TX_HASH_FN(self.binaryReadForHash)
 
     def read_tx(self,get_hash=False):
