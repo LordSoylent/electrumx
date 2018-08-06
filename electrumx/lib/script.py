@@ -182,7 +182,7 @@ class Script(object):
         ops = []
         n = 1
         lengthScript = len(script)
-        if len(script) > 1:
+        if lengthScript > 1:
             if script[0] == 82:
                if script[1] >= 82 or script[1] <= 91:
                    n += 1

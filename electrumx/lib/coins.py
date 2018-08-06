@@ -786,6 +786,7 @@ class Syscoin(AuxPowMixin, Coin):
     TX_COUNT_HEIGHT = 135000
     TX_PER_BLOCK = 10
     REORG_LIMIT = 2000
+    DESERIALIZER = lib_tx.DeserializerSyscoin
 
 class SyscoinTestnet(Syscoin):
     NAME = "Syscoin"

@@ -280,6 +280,44 @@ class DeserializerAuxPow(Deserializer):
         self.cursor = start
         return self._read_nbytes(header_end)
 
+class DeserializerSyscoin(DeserializerAuxPow):
+
+    # Transactions that contain Syscoin data carrying outputs,
+    # have a version of 0x7400
+    SYSCOIN_TX_VERSION = 0x7400
+
+    def read_tx_and_hash(self):
+        '''Return a (deserialized TX, tx_hash) pair.
+
+        The hash needs to be reversed for human display; for efficiency
+        we process it in the natural serialized order.
+        '''
+        start = self.cursor
+        return self.read_tx(get_hash=True), self.TX_HASH_FN(self.binary[start:self.cursor])
+
+    def read_tx(self,get_hash=False):
+        '''Return a deserialized transaction.'''
+        version = self._read_le_int32()
+        return Tx(
+            version,  # version
+            self._read_inputs(),    # inputs
+            self._read_outputs(get_hash,tx_version=version),   # outputs
+            self._read_le_uint32()  # locktime
+        )
+
+    def _read_outputs(self,get_hash,tx_version):
+        read_output = self._read_output
+        return [read_output(get_hash,tx_version) for i in range(self._read_varint())]
+
+    def _read_output(self,get_hash,tx_version):
+        scriptPubKey = self._read_varbytes()
+        if (tx_version == self.SYSCOIN_TX_VERSION and
+                scriptPubKey[0] == OpCodes.OP_RETURN and get_hash == True):
+            scriptPubKey[:1]
+        return TxOutput(
+            self._read_le_int64(),  # value
+            scriptPubKey,  # pk_script
+        )
 
 class DeserializerAuxPowSegWit(DeserializerSegWit, DeserializerAuxPow):
     pass
