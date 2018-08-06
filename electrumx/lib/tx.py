@@ -287,6 +287,12 @@ class DeserializerSyscoin(DeserializerAuxPow):
     # have a version of 0x7400
     SYSCOIN_TX_VERSION = 0x7400
 
+    def __init__(self, binary, start=0):
+        assert isinstance(binary, bytes)
+        self.binary = bytearray(binary)
+        self.binary_length = len(binary)
+        self.cursor = start
+
     def read_tx_and_hash(self):
         '''Return a (deserialized TX, tx_hash) pair.
 
