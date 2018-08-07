@@ -312,13 +312,16 @@ class DeserializerSyscoin(DeserializerAuxPow):
 
     def _read_output(self,get_hash,tx_version):
         value =  self._read_le_int64()
+        start = self.cursor
         scriptPubKey = self._read_varbytes()
         if (tx_version == self.SYSCOIN_TX_VERSION and
                 scriptPubKey[0] == OpCodes.OP_RETURN and get_hash == True):
                 scriptLength = len(scriptPubKey)
-                self.binary = self.binary[:self.cursor-scriptLength+1] + self.binary[self.cursor+1:]
-                self.binary_length -= scriptLength-1
-                self.cursor -= scriptLength-1
+                self.binary = self.binary[:start] + bytes([1]) + bytes([OpCodes.OP_RETURN]) + self.binary[self.cursor:]
+                self.binary_length = len(self.binary)
+                self.cursor = start+2
+
+
         return TxOutput(
             value,  # value
             scriptPubKey,  # pk_script
