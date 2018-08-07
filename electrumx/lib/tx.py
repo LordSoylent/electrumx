@@ -281,12 +281,63 @@ class DeserializerAuxPow(Deserializer):
         self.cursor = start
         return self._read_nbytes(header_end)
 
+class SyscoinService(Deserializer)
+    def _read_range(self):
+	    self._read_nbytes(4) # start
+	    self._read_nbytes(4) # end
+    def _read_ranges(self):
+        self._read_range() for i in range(self._read_varint())
+
+class SyscoinAsset(SyscoinService):
+    def _read_asset(self):
+	    self._read_varbytes() # vchPubData
+		self._read_nbytes(32)   # txHash
+		self._read_varint # nHeight
+        self._read_varbytes() # vchSymbol
+        self._read_varbytes() # sCategory
+		self._read_ranges() # listAllocationInputs
+		self._read_nbytes(8) # nBalance
+		self._read_nbytes(8) # nTotalSupply
+		self._read_nbytes(8) # nMaxSupply
+		self._read_byte # bUseInputRanges
+		self._read_nbytes(4) # fInterestRate
+        self._read_byte # bCanAdjustInterestRate
+		self._read_varint # nPrecision
+		return True
+
+class SyscoinAssetAllocation(SyscoinService):
+    def _read_input_ranges(self):
+	    self._read_varbytes()
+	    self._read_ranges()
+    def _read_input_ranges_array(self):
+	    self._read_input_ranges() for i in range(self._read_varint())
+    def _read_amount(self):
+	    self._read_varbytes()
+	    self._read_nbytes(8)
+    def _read_amounts_array(self):
+	    self._read_amount() for i in range(self._read_varint())
+    def _read_asset_allocation(self):
+	    self._read_varbytes() # vchAsset
+		self._read_varbytes() # vchAliasOrAddress
+		self._read_nbytes(32)   # txHash
+		self._read_varint # nHeight
+		self._read_varint # nLastInterestClaimHeight
+		self._read_ranges() # listAllocationInputs
+        self._read_input_ranges_array() # listSendingAllocationInputs
+		self._read_amounts_array() # listSendingAllocationAmounts
+		self._read_nbytes(8) # nBalance
+		self._read_varint # nAccumulatedBalanceSinceLastInterestClaim
+		self._read_nbytes(4) # fAccumulatedInterestSinceLastInterestClaim
+        self._read_nbytes(4) # fInterestRate
+		self._read_varbytes() # vcvchMemohAsset
+		return True
+
 class DeserializerSyscoin(DeserializerAuxPow):
 
     # Transactions that contain Syscoin data carrying outputs,
     # have a version of 0x7400
     SYSCOIN_TX_VERSION = 0x7400
-
+	
     def read_tx_and_hash(self):
         '''Return a (deserialized TX, tx_hash) pair.
 
@@ -305,7 +356,6 @@ class DeserializerSyscoin(DeserializerAuxPow):
             self._read_outputs(get_hash,tx_version=version),   # outputs
             self._read_le_uint32()  # locktime
         )
-
     def _read_outputs(self,get_hash,tx_version):
         read_output = self._read_output
         return [read_output(get_hash,tx_version) for i in range(self._read_varint())]
@@ -314,13 +364,16 @@ class DeserializerSyscoin(DeserializerAuxPow):
         value =  self._read_le_int64()
         start = self.cursor
         scriptPubKey = self._read_varbytes()
-        if (tx_version == self.SYSCOIN_TX_VERSION and
-                scriptPubKey[0] == OpCodes.OP_RETURN and get_hash == True):
-                scriptLength = len(scriptPubKey)
-                self.binary = self.binary[:start] + bytes([1]) + bytes([OpCodes.OP_RETURN]) + self.binary[self.cursor:]
-                self.binary_length = len(self.binary)
-                self.cursor = start+2
-
+		if tx_version == self.SYSCOIN_TX_VERSION:
+            assetallocation = SyscoinAssetAllocation(scriptPubKey);
+			if assetallocation.read_asset_allocation() == False:
+                asset = SyscoinAssetAllocation(scriptPubKey);
+                if asset.read_asset() == False:
+                    if scriptPubKey[0] == OpCodes.OP_RETURN and get_hash == True:
+                        scriptLength = len(scriptPubKey)
+                        self.binary = self.binary[:start] + bytes([1]) + bytes([OpCodes.OP_RETURN]) + self.binary[self.cursor:]
+                        self.binary_length = len(self.binary)
+                        self.cursor = start+2
 
         return TxOutput(
             value,  # value
